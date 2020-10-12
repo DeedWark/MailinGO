@@ -79,8 +79,8 @@ func main() {
 	//Base64 encoding
 	fmt.Print("Encode body in base64 [Y/n]: ")
 	scanner.Scan()
-	b64 := content
-	encoding := "plain"
+	var b64 string
+	var encoding string
 	choice := scanner.Text()
 	switch choice {
 	case "Y", "y", "yes", "Yes", "YES":
@@ -88,10 +88,10 @@ func main() {
 		encoding = "base64"
 	case "N", "n", "no", "No", "NO":
 		b64 = content
-		encoding = "plain"
+		encoding = "7bit"
 	default:
 		b64 = content
-		encoding = "plain"
+		encoding = "7bit"
 	}
 
 	//Body

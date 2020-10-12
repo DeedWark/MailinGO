@@ -79,15 +79,19 @@ func main() {
 	//Base64 encoding
 	fmt.Print("Encode body in base64 [Y/n]: ")
 	scanner.Scan()
-	choice := scanner.Text()
 	b64 := content
+	encoding := "plain"
+	choice := scanner.Text()
 	switch choice {
 	case "Y", "y", "yes", "Yes", "YES":
 		b64 = base64.URLEncoding.EncodeToString([]byte(content))
+		encoding = "base64"
 	case "N", "n", "no", "No", "NO":
 		b64 = content
+		encoding = "plain"
 	default:
 		b64 = content
+		encoding = "plain"
 	}
 
 	//Body
@@ -97,7 +101,7 @@ func main() {
 		"Date: " + hdate + "\r\n" +
 		"Message-ID: " + hid + "\r\n" +
 		"Content-Type: text/plain; charset=\"UTF-8\"\r\n" +
-		"Content-Transfer-Encoding: base64\r\n" +
+		"Content-Transfer-Encoding: " + encoding + "\r\n" +
 		"\r\n" + b64
 
 	fmt.Println("\r\n" + "---------------Overview---------------" + "\n" + contentmore + "\n" + "--------------------------------------")

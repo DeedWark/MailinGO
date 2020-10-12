@@ -1,4 +1,4 @@
-//@Kenji DURIEZ - 2020
+//@Kenji DURIEZ - [DeedWark] - 2020
 //Send an email like Telnet in Golang with KeyboardScanner
 
 package main

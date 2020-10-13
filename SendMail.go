@@ -126,7 +126,13 @@ func main() {
 
 		//Encode file/attachment in base64
 		encodedFile := base64.StdEncoding.EncodeToString(content)
-
+		for i, g := 0, len(encodedFile); i < g; i++ {
+			b64buf := bytes.NewBuffer(nil)
+			b64buf.WriteByte(encodedFile[i])
+			if (i+1)%76 == 0 {
+				b64buf.WriteString("\r\n")
+			}
+		}
 		//All the data to send
 		contentmore = "From: " + hfrom + "\r\n" +
 			"To: " + hto + "\r\n" +

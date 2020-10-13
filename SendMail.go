@@ -115,14 +115,16 @@ func main() {
 
 		fmt.Print("Filename: ")
 		scanner.Scan()
-		filename := scanner.Text()
-		fileraw, err := os.Open(filename) //Open the attachment file
+		filePath := scanner.Text()
+		fileraw, err := os.Open(filePath) //Open the attachment file
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		reader := bufio.NewReader(fileraw)   //Init file reader
-		content, _ := ioutil.ReadAll(reader) //Read and get the file content
+		reader := bufio.NewReader(fileraw)       //Init file reader
+		content, _ := ioutil.ReadAll(reader)     //Read and get the file content
+		fileOnly := strings.Split(filePath, "/") //Split at / -> see just below
+		filename := fileOnly[len(fileOnly)-1]    //Get the filename in case of path is like "../dir/dir/image.png"
 
 		//Encode file/attachment in base64
 		encodedFile := base64.StdEncoding.EncodeToString(content)

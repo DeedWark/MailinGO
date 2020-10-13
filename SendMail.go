@@ -126,6 +126,7 @@ func main() {
 
 		//Encode file/attachment in base64
 		encodedFile := base64.StdEncoding.EncodeToString(content)
+		//76 char per line for b64 attach
 		for i, g := 0, len(encodedFile); i < g; i++ {
 			b64buf := bytes.NewBuffer(nil)
 			b64buf.WriteByte(encodedFile[i])

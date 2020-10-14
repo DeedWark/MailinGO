@@ -113,7 +113,7 @@ func main() {
 
 	case "y", "yes":
 
-		fmt.Print("Filename: ")
+		fmt.Print("File: ")
 		scanner.Scan()
 		filePath := scanner.Text()
 		fileraw, err := os.Open(filePath) //Open the attachment file
@@ -144,17 +144,17 @@ func main() {
 			"Message-ID: " + hid + "\r\n" +
 			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
 			"MIME-Version: 1.0" + "\r\n" +
-			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_000_1111\"" + "\r\n\n" +
-			"------=_MIME_BOUNDARY_000_1111" + "\r\n" +
+			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\n" +
+			"------=_MIME_BOUNDARY_GOO_LANG" + "\r\n" +
 			"Content-Type: text/plain" + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + b64 + "\r\n" +
-			"------=_MIME_BOUNDARY_000_1111" + "\r\n" +
+			"------=_MIME_BOUNDARY_GOO_LANG" + "\r\n" +
 			"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\n" +
-			encodedFile + "\r\n\n" + "------=_MIME_BOUNDARY_000_1111--"
+			encodedFile + "\r\n\n" + "------=_MIME_BOUNDARY_GOO_LANG--"
 
 	case "n", "no":
 

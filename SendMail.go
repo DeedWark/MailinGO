@@ -137,14 +137,14 @@ func main() {
 			}
 		}
 		//All the data to send
-		contentmore = "From: " + hfrom + "\r\n" +
+		contentmore = "Date: " + hdate + "\r\n" +
+			"From: " + hfrom + "\r\n" +
 			"To: " + hto + "\r\n" +
 			"Subject: " + hsub + "\r\n" +
-			"Date: " + hdate + "\r\n" +
 			"Message-ID: " + hid + "\r\n" +
 			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
 			"MIME-Version: 1.0" + "\r\n" +
-			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\n" +
+			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\r\n" +
 			"------=_MIME_BOUNDARY_GOO_LANG" + "\r\n" +
 			"Content-Type: text/plain" + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
@@ -153,16 +153,16 @@ func main() {
 			"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
-			"Content-Transfer-Encoding: base64" + "\r\n\n" +
-			encodedFile + "\r\n\n" + "------=_MIME_BOUNDARY_GOO_LANG--"
+			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
+			encodedFile + "\r\n" + "------=_MIME_BOUNDARY_GOO_LANG--"
 
 	case "n", "no":
 
 		//All the data without attachment
-		contentmore = "From: " + hfrom + "\r\n" +
+		contentmore = "Date: " + hdate + "\r\n" +
+			"From: " + hfrom + "\r\n" +
 			"To: " + hto + "\r\n" +
 			"Subject: " + hsub + "\r\n" +
-			"Date: " + hdate + "\r\n" +
 			"Message-ID: " + hid + "\r\n" +
 			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
 			"MIME-Version: 1.0" + "\r\n" +

@@ -199,6 +199,7 @@ func main() {
 	if _, err = buf.WriteTo(mxc); err != nil {
 		fmt.Println(errorTxt, "500: Mail not sent!")
 		log.Fatal(err)
+	} else {
+		fmt.Printf("\n"+greenTxt, "250: Mail sent!\r\n")
 	}
-	fmt.Printf("\n"+greenTxt, "250: Mail sent!\r\n")
 }

@@ -154,7 +154,7 @@ func main() {
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			encodedFile + "\r\n" + "------=_MIME_BOUNDARY_GOO_LANG--"
+			encodedFile + "\r\n\r\n" + "------=_MIME_BOUNDARY_GOO_LANG--"
 
 	case "n", "no":
 

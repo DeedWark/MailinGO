@@ -85,6 +85,7 @@ func main() {
 	}
 	randid := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 	hid := "<" + randid + "@golangmail.this>"
+	hrid := hid
 
 	//Encode in base64 the body ?
 	fmt.Print("Encode body in base64 [Y/n]: ")
@@ -141,7 +142,7 @@ func main() {
 			"From: " + hfrom + "\r\n" +
 			"To: " + hto + "\r\n" +
 			"Subject: " + hsub + "\r\n" +
-			"Message-ID: " + hid + "\r\n" +
+			"Message-ID: " + hrid + "\r\n" +
 			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
 			"MIME-Version: 1.0" + "\r\n" +
 			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\r\n" +
@@ -163,7 +164,7 @@ func main() {
 			"From: " + hfrom + "\r\n" +
 			"To: " + hto + "\r\n" +
 			"Subject: " + hsub + "\r\n" +
-			"Message-ID: " + hid + "\r\n" +
+			"Message-ID: " + hrid + "\r\n" +
 			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
 			"MIME-Version: 1.0" + "\r\n" +
 			"Content-Type: text/plain; charset=\"UTF-8\"\r\n" +
@@ -200,6 +201,6 @@ func main() {
 		fmt.Println(errorTxt, "500: Mail not sent!")
 		log.Fatal(err)
 	} else {
-		fmt.Printf("\n"+greenTxt, "250: Mail sent!\r\n")
+		fmt.Printf("\n"+greenTxt, "250: Mail sent!  -->  Message-ID: "+hrid+"\r\n")
 	}
 }

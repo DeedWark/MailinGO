@@ -200,5 +200,5 @@ func main() {
 		fmt.Println(errorTxt, "500: Mail not sent!")
 		log.Fatal(err)
 	}
-	fmt.Printf("\n"+greenTxt, "250: Mail sent!\r")
+	fmt.Printf("\n"+greenTxt, "250: Mail sent!\r\n")
 }

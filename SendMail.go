@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/smtp"
 	"os"
 	"strings"
@@ -27,11 +28,6 @@ func main() {
 	//INITIALIZE THE KEYBOARD SCANNER
 	scanner := bufio.NewScanner(os.Stdin)
 
-	//MX
-	fmt.Print("SMTP: ")
-	scanner.Scan()
-	smtpServ := scanner.Text()
-
 	//MAIL FROM
 	fmt.Print("FROM: ")
 	scanner.Scan()
@@ -41,6 +37,37 @@ func main() {
 	fmt.Print("TO: ")
 	scanner.Scan()
 	rcptTo := scanner.Text()
+
+	//Get rcptTo domain
+	cutDomain := strings.Split(rcptTo, "@") //Get only domain
+	domainOnly := cutDomain[len(cutDomain)-1]
+
+	//Auto detect mx for a domain
+	mxServ := []string{}
+	mxs, _ := net.LookupMX(domainOnly) //Resolve MX
+	var indx string
+	if len(mxs) == 0 {
+		indx = "none"
+	} else {
+		for _, mx := range mxs {
+			mxRaw := strings.TrimRight(mx.Host, ".") //cut . at the end
+			mxServ = append(mxServ, mxRaw)           //get MX
+		}
+	}
+	cutMx := strings.Join(mxServ, "\n")  //join mx
+	mxList := strings.Split(cutMx, "\n") //slice
+	indx = mxList[0]                     //Get only 1st mx
+	var defMx string
+	if defMx != "" {
+		defMx = " (default: " + indx + "):"
+	} else {
+		defMx = ": "
+	}
+
+	//MX
+	fmt.Print("SMTP" + defMx)
+	scanner.Scan()
+	smtpServ := scanner.Text()
 
 	//From (header)
 	fmt.Print("From: ")

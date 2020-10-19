@@ -58,7 +58,7 @@ func main() {
 	mxList := strings.Split(cutMx, "\n") //slice
 	indx = mxList[0]                     //Get only 1st mx
 	var defMx string
-	if defMx != "" {
+	if indx != "" {
 		defMx = " (default: " + indx + "):"
 	} else {
 		defMx = ": "

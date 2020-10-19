@@ -59,7 +59,7 @@ func main() {
 	indx = mxList[0]                     //Get only 1st mx
 	var defMx string
 	if indx != "" {
-		defMx = " (default: " + indx + "):"
+		defMx = " (default: " + indx + "): "
 	} else {
 		defMx = ": "
 	}

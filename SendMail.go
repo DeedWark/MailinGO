@@ -68,6 +68,9 @@ func main() {
 	fmt.Print("SMTP" + defMx)
 	scanner.Scan()
 	smtpServ := scanner.Text()
+	if smtpServ == "" {
+		smtpServ = indx
+	}
 
 	//From (header)
 	fmt.Print("From: ")

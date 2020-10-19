@@ -46,9 +46,7 @@ func main() {
 	mxServ := []string{}
 	mxs, _ := net.LookupMX(domainOnly) //Resolve MX
 	var indx string
-	if len(mxs) == 0 {
-		indx = "none"
-	} else {
+	if len(mxs) != 0 {
 		for _, mx := range mxs {
 			mxRaw := strings.TrimRight(mx.Host, ".") //cut . at the end
 			mxServ = append(mxServ, mxRaw)           //get MX

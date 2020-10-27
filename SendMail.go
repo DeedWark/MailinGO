@@ -220,7 +220,7 @@ func main() {
 	// Send email body
 	mxc, err := mx.Data()
 	if err != nil {
-		fmt.Printf("\n"+errorTxt, "Body Error!"+"\n")
+		fmt.Printf("\n"+errorTxt, "Error while sending data!"+"\n")
 		log.Fatal(err)
 	}
 	defer mxc.Close()

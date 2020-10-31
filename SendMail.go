@@ -1,6 +1,3 @@
-//@Kenji DURIEZ - [DeedWark] - 2020
-//Send an email with Go || Base64 encoding w\ Attachment (base64)
-
 package main
 
 import (
@@ -24,17 +21,26 @@ const (
 	errorTxt = "\033[91m%s\033[00m"
 )
 
+var contentmore string
+var hdate string
+var hfrom string
+var hto string
+var hrid string
+var ctype string
+var b64 string
+var encoding string
+
 func main() {
-	//INITIALIZE THE KEYBOARD SCANNER
+	//INIT THE KEYBOARD SCANNER
 	scanner := bufio.NewScanner(os.Stdin)
 
 	//MAIL FROM
-	fmt.Print("FROM: ")
+	fmt.Print("MAIL FROM: ")
 	scanner.Scan()
 	mailFrom := scanner.Text()
 
 	//RCPT TO
-	fmt.Print("TO: ")
+	fmt.Print("RCPT TO: ")
 	scanner.Scan()
 	rcptTo := scanner.Text()
 
@@ -70,12 +76,12 @@ func main() {
 		smtpServ = indx
 	}
 
-	//From (header)
+	//Header From
 	fmt.Print("From: ")
 	scanner.Scan()
 	hfrom := scanner.Text()
 
-	//To (header)
+	//Header To
 	fmt.Print("To: ")
 	scanner.Scan()
 	hto := scanner.Text()
@@ -85,18 +91,26 @@ func main() {
 	scanner.Scan()
 	hsub := scanner.Text()
 
-	//Current Date
+	//Current date
 	dt := time.Now()
 	hdate := dt.Format("Mon, 02 Jan 2006 15:04:05 -0700")
 
-	//Body (Multiline)
+	//BODY
 	fmt.Println("CONTENT [. to quit]")
 	block := []string{}
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line != "." {
-			block = append(block, line)
-			continue
+			ctype = "text/plain"
+			if line == "<html>" || line == "</html>" {
+				ctype = "text/html"
+				block = append(block, line)
+				continue
+			} else {
+				ctype = "text/plain"
+				block = append(block, line)
+				continue
+			}
 		} else {
 			break
 		}
@@ -109,35 +123,42 @@ func main() {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
-		log.Fatal(err)
+		hrid = ""
+	} else {
+		randid := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+		hid := "<" + randid + "@golangmail.this>"
+		hrid = hid
 	}
-	randid := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
-	hid := "<" + randid + "@golangmail.this>"
-	hrid := hid
 
-	//Encode in base64 the body ?
-	fmt.Print("Encode body in base64 [Y/n]: ")
-	scanner.Scan()
-	var b64 string
-	var encoding string
-	choice := scanner.Text()
-	switch strings.ToLower(choice) {
-	case "y", "yes":
-		b64 = base64.URLEncoding.EncodeToString([]byte(content))
-		encoding = "base64"
-	case "n", "no":
+	if ctype == "text/html" {
 		b64 = content
 		encoding = "7bit"
-	default:
-		b64 = content
-		encoding = "7bit"
+	} else {
+		fmt.Print("Encode body in base64 [Y/n]: ")
+		scanner.Scan()
+		choice := scanner.Text()
+		switch strings.ToLower(choice) {
+		case "y", "yes":
+			b64 = base64.URLEncoding.EncodeToString([]byte(content))
+			encoding = "base64"
+			ctype = "text/plain"
+		case "n", "no":
+			b64 = content
+			encoding = "7bit"
+		default:
+			b64 = content
+			encoding = "7bit"
+		}
 	}
 
 	//Add Attachment ?
 	fmt.Print("Attachment [Y/n]: ")
 	scanner.Scan()
 	att_ch := scanner.Text()
+
 	var contentmore string
+	var baseContentType string
+
 	switch strings.ToLower(att_ch) {
 
 	case "y", "yes":
@@ -166,16 +187,9 @@ func main() {
 			}
 		}
 		//All the data to send
-		contentmore = "Date: " + hdate + "\r\n" +
-			"From: " + hfrom + "\r\n" +
-			"To: " + hto + "\r\n" +
-			"Subject: " + hsub + "\r\n" +
-			"Message-ID: " + hrid + "\r\n" +
-			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
-			"MIME-Version: 1.0" + "\r\n" +
-			"Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\r\n" +
+		baseContentType = "Content-Type: multipart/mixed; boundary=\"----=_MIME_BOUNDARY_GOO_LANG\"" + "\r\n\r\n" +
 			"------=_MIME_BOUNDARY_GOO_LANG" + "\r\n" +
-			"Content-Type: text/plain" + "\r\n" +
+			"Content-Type: " + ctype + "; charset=\"UTF-8\"" + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + b64 + "\r\n" +
 			"------=_MIME_BOUNDARY_GOO_LANG" + "\r\n" +
@@ -188,17 +202,19 @@ func main() {
 	case "n", "no":
 
 		//All the data without attachment
-		contentmore = "Date: " + hdate + "\r\n" +
-			"From: " + hfrom + "\r\n" +
-			"To: " + hto + "\r\n" +
-			"Subject: " + hsub + "\r\n" +
-			"Message-ID: " + hrid + "\r\n" +
-			"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
-			"MIME-Version: 1.0" + "\r\n" +
-			"Content-Type: text/plain; charset=\"UTF-8\"\r\n" +
+		baseContentType = "Content-Type: " + ctype + "; charset=\"UTF-8\"" + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + b64
 	}
+
+	contentmore = "Date: " + hdate + "\r\n" +
+		"From: " + hfrom + "\r\n" +
+		"To: " + hto + "\r\n" +
+		"Subject: " + hsub + "\r\n" +
+		"Message-ID: " + hrid + "\r\n" +
+		"X-Mailer: SendMail-Golang v1.0" + "\r\n" +
+		"MIME-Version: 1.0" + "\r\n" +
+		baseContentType
 
 	//Print Overview
 	fmt.Println("\r\n" + "---------------Overview---------------" + "\n" + contentmore + "\n" + "--------------------------------------")
@@ -220,7 +236,7 @@ func main() {
 	// Send email body
 	mxc, err := mx.Data()
 	if err != nil {
-		fmt.Printf("\n"+errorTxt, "Error while sending data!"+"\n")
+		fmt.Printf("\n"+errorTxt, "Body Error!"+"\n")
 		log.Fatal(err)
 	}
 	defer mxc.Close()

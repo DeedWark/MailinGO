@@ -1,6 +1,6 @@
 # SendMail (Golang)
 
-Allow you to send email with this Go program
+Send email with this Go program
 
 ## Setup
 ```bash

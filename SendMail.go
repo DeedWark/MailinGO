@@ -17,6 +17,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const ( //COLOR
@@ -301,33 +303,52 @@ func sendMail() {
 	fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
 	fmt.Println(cyanTXT + "Sending in progress... please wait!" + "\n" + endTXT)
 
-	//
-	//Connect to SMTP serv
-	mx, err := smtp.Dial(smtpServ + ":" + port)
-	if err != nil {
-		fmt.Println(redTXT + "Error: Cannot connect to " + smtpServ + ":" + port + "\n" + endTXT)
-		log.Fatalln(err)
-	}
-	defer mx.Close()
+	if auth != false {
+		if mailFrom != "" {
+			//ASK password
+			fmt.Print("Password: ")
+			password, _ := terminal.ReadPassword(0)
 
-	//
-	//Set MailFrom and RcptTo
-	mx.Mail(mailFrom)
-	mx.Rcpt(rcptTo)
-
-	//
-	//Send email body
-	mxc, err := mx.Data()
-	if err != nil {
-		fmt.Println(redTXT + "Error: " + endTXT)
-		log.Fatalln(err)
-	}
-	defer mxc.Close()
-	buf := bytes.NewBufferString(body)
-	if _, err = buf.WriteTo(mxc); err != nil {
-		fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
+			from := mailFrom
+			err := smtp.SendMail("smtp.gmail.com:587",
+				smtp.PlainAuth("", from, string(password), "smtp.gmail.com"),
+				from, []string{rcptTo}, []byte(body))
+			fmt.Println(string(password))
+			if err != nil {
+				fmt.Println(redTXT + "Error with Auth" + endTXT)
+				log.Fatalln(err)
+			}
+		}
 	} else {
-		fmt.Println(greenTXT + "250: Mail sent!  -->  Message-ID: " + messageId + "\r\n")
+		//
+		//Connect to SMTP serv
+		mx, err := smtp.Dial(smtpServ + ":" + port)
+		if err != nil {
+			fmt.Println(redTXT + "Error: Cannot connect to " + smtpServ + ":" + port + "\n" + endTXT)
+			log.Fatalln(err)
+		}
+		defer mx.Close()
+
+		//
+		//Set MailFrom and RcptTo
+		mx.Mail(mailFrom)
+		mx.Rcpt(rcptTo)
+
+		//
+		//Send email body
+		mxc, err := mx.Data()
+		if err != nil {
+			fmt.Println(redTXT + "Error: " + endTXT)
+			log.Fatalln(err)
+		}
+		defer mxc.Close()
+		buf := bytes.NewBufferString(body)
+		if _, err = buf.WriteTo(mxc); err != nil {
+			fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
+		} else {
+			fmt.Println(greenTXT + "250: Mail sent!  -->  Message-ID: " + messageId + "\r\n")
+		}
+
 	}
 }
 

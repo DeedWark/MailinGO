@@ -1,3 +1,6 @@
+//@Kenji DURIEZ - [DeedWark] - 2020
+//Send email with Go
+
 package main
 
 import (

@@ -34,7 +34,7 @@ gomail
 --boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
 --base64 Encode  body in base64
---prompt         Get a prompt to write on your terminal 
+--prompt         Get a prompt to write content body via terminal 
 ```
 ## Overview
 ```

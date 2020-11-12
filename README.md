@@ -2,8 +2,7 @@
 
 Allow you to send email with this Go program
 
-## How to use
-You can build this program
+## Setup
 ```bash
 go build -o gomail SendMail.go
 #and execute the built program
@@ -13,44 +12,32 @@ go build -o gomail SendMail.go
 gomail
 ```
 
-You can now launch this program
+## How to use
+
 ```bash
-go run SendMail.go
+  -s  	         Set SMTP/MX server (default "Autodetect with domain")
+  -p  	         Set TCP Port (default "25/SMTP")
+  -f             Set MAIL FROM (protocolar)
+  -t  	         Set RCPT TO (protocolar)
+--hfrom          Set Header From (ex "Me <go@lang.org>")
+--hto            Set Header To (ex "You <go@pher.org>")
+--subject        Set a subject
+--date           Set a custom date (default "current date")
+--body           Write content to Body
+--attach         Add an attachment/file
+--auth           Enable authentication (Gmail, Outlook...)
+--x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
+--x-priority     Set a custom X-Priority
+--charset        Set a custom charset (default "UTF-8")
+--html-file      Import a HTML file as body
+--text-file      Import a TXT file as body
+--boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
+--content-type   Set a custom Content-Type (default "text/plain")
+--base64 Encode  body in base64
+--prompt         Get a prompt to write on your terminal 
 ```
-
-## Usage (Multiline content is possible)
-
-```bash
-FROM: 
-TO:
-SMTP:
-From: 
-To: 
-Subject: 
-CONTENT [. to quit]
-
-.
-Encode body in base64 [Y/n]:
-
-250: Message sent
+## Overview
 ```
-Example:
-```bash
-FROM: sender@domain.com
-TO: receiver@domain.com
-SMTP (default: smtp.domain.com):
-From: Me <sender@domain.com>
-To: You <receiver@domain.com>
-Subject: Hello
-CONTENT [. to quit]
-Hello, 
-
-This mail is sent with Golang.
-
-Bye,
-.
-Encode body in base64 [Y/n]: Y
-
 ---------------Overview---------------
 
 Date: Mon, 12 Oct 2020 20:00:00 +0200From: Me <sender@domain.com>
@@ -67,25 +54,8 @@ Sending in progress... please wait!
 250: Mail sent!  -->  Message-ID: <c5896269-c2c4-77e3-4bd7-a3b5feBc71a@golangmail.this>
 ```
 
-Example with attachment:
+- With attachment
 ```
-FROM: sender@domain.com
-TO: receiver@domain.com
-SMTP (default: smtp.domain.com):
-From: Me <sender@domain.com>
-To: You <receiver@domain.com
-Subject: Hello
-CONTENT [. to quit]
-Hello,
-
-This mail with attachment is sent with Golang.
-
-Bye,
-.
-Encode body in base64 [Y/n]: Y
-Attachment [Y/n]: y
-File: ./test.png
-
 ---------------Overview---------------
 Date: Tue, 27 Oct 2020 14:03:49 +0100
 From: Me <sender@domain.com>
@@ -93,6 +63,7 @@ To: You <receiver@domain.com>
 Subject: Hello
 Message-ID: <687a38e5-6d7e-499c-1607-2d696574c354@golangmail.this>
 X-Mailer: SendMail-Golang v1.0
+X-Priority: 1
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="----=_MIME_BOUNDARY_GOO_LANG"
 

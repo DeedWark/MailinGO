@@ -25,7 +25,7 @@ gomail
 --date           Set a custom date (default "current date")
 --body           Write content to Body
 --attach         Add an attachment/file
---auth           Enable authentication (Gmail, Outlook...)
+--auth           Enable authentication (just Gmail, others soon)
 --x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
 --x-priority     Set a custom X-Priority
 --charset        Set a custom charset (default "UTF-8")

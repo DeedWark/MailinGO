@@ -33,7 +33,7 @@ gomail
 --text-file      Import a TXT file as body
 --boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
---base64 Encode  body in base64
+--base64         Encode body in base64
 --prompt         Get a prompt to write content body via terminal 
 ```
 ## Overview

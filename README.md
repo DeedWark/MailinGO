@@ -4,7 +4,7 @@ Send email with this Go program
 
 ## Setup
 ```bash
-go build -o gomail SendMail.go
+go build -o gomail sendMailV2.go
 #and execute the built program
 ./gomail
 

@@ -64,6 +64,7 @@ var txtFileContent []byte  //Txt file content
 var bs64 bool              //Set base64 encoding
 var xprio string           //X-Priority
 var boundary string        //Custom Boundary
+var encodeF string         //Change encode (7bit / 8bit / binary)
 
 func usage() {
 	fmt.Println(`
@@ -113,7 +114,7 @@ func flags() {
 	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
-	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt")
+	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
 
 	flag.Parse()
 }
@@ -258,16 +259,11 @@ func sendMail() {
 	// Attachment //
 	////////////////
 	if attach != "" {
-		//fileRaw, err := os.Open(attach) //Open file
-		/*if err != nil {
-			log.Fatalln(redTXT + "Cannot open the File as attachment" + endTXT)
-		}*/
 		fileRaw := attach
 
-		//fileReader := bufio.NewReader(fileRaw)        //Init the file reader
 		contentFile, err := ioutil.ReadFile(fileRaw) //Read and get content file
 		if err != nil {
-			fmt.Println(redTXT+"File error: "+endTXT, err)
+			log.Fatalln(redTXT+"File error:"+endTXT, err)
 		}
 
 		mimeFile := http.DetectContentType(contentFile)
@@ -291,7 +287,7 @@ func sendMail() {
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			chunkSplit(encodedFile, 76, "\n") + "\r\n\r\n" + boundary
+			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + boundary
 	} else {
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
@@ -363,7 +359,7 @@ func sendMail() {
 ///////////////////////////////////////////////////////////////////////////////
 // Split attachment base64 encoding according to RFC (max 76 chars by line) //
 /////////////////////////////////////////////////////////////////////////////
-func chunkSplit(body string, limit int, end string) string {
+func rfcSplit(body string, limit int, end string) string {
 	var charSlice []rune
 
 	// push characters to slice

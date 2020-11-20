@@ -113,6 +113,7 @@ func flags() {
 	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
+	flag.StringVar(&encodeF, "encoding", "7bit", "Set a ncoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
 	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
 
@@ -131,7 +132,7 @@ func sendMail() {
 	/////////////////////////////////////
 	//      RESOLVE MX WITH DOMAIN     //
 	/////////////////////////////////////
-	cutAddress := strings.Split(rcptTo, "@") //remove @
+	cutAddress := strings.Split(rcptTo, "@") //[1] //remove @
 	domainOnly := cutAddress[len(cutAddress)-1]
 
 	mxServ := []string{}
@@ -202,8 +203,6 @@ func sendMail() {
 			charset = "UTF-8"
 		case "usascii", "us", "us-ascii":
 			charset = "US-ASCII"
-		case "quoted-printable", "qp", "quoted", "printable":
-			charset = "quoted-printable"
 		default:
 			charset = "UTF-8"
 		}
@@ -239,6 +238,23 @@ func sendMail() {
 		txtFileContent, _ = ioutil.ReadAll(reader) //Read and get HTML file content
 		body = string(txtFileContent)
 		ctype = "text/plain"
+	}
+
+	//////////////////////
+	// Choosen Encoding //
+	//////////////////////
+	if encodeF != "" {
+		switch strings.ToLower(encodeF) {
+		case "7bit", "7-bit":
+			encodeF = "7bit"
+		case "8-bit", "8bit":
+			encodeF = "8bit"
+		case "qp", "quoted", "quoted-printable", "printable":
+			encodeF = "quoted-printable"
+		default:
+			encodeF = "7bit"
+		}
+		encoding = encodeF
 	}
 
 	///////////////////////////////

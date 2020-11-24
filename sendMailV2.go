@@ -200,11 +200,11 @@ func sendMail() {
 	if charset != "" {
 		switch strings.ToLower(charset) {
 		case "utf-8", "utf8":
-			charset = "UTF-8"
+			charset = "\"UTF-8\""
 		case "usascii", "us", "us-ascii":
-			charset = "US-ASCII"
+			charset = "\"US-ASCII\""
 		default:
-			charset = "UTF-8"
+			charset = "\"UTF-8\""
 		}
 	}
 

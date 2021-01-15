@@ -76,18 +76,19 @@ func usage() {
 --hto            Set Header To (ex "You <go@pher.org>")
 --subject        Set a subject
 --date           Set a custom date (default "current date")
---body           Write content to Body
+--body           Add content to Body
 --attach         Add an attachment/file
 --auth           Enable authentication (Gmail, Outlook...)
 --x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
---x-priority     Set a custom X-Priority
+--x-priority     Set a custom X-Priority (default "1")
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
 --boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
---base64 Encode  body in base64
---prompt         Get a prompt to write on your terminal `)
+--encoding       Set an encoding (default "7bit")
+--base64         Encode body in base64 (default no)
+--prompt         Write body with a Prompt (HTML allowed) ` + "\r\n")
 }
 
 func flags() {
@@ -107,17 +108,22 @@ func flags() {
 	//MORE OPTIONS
 	//flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
 	flag.StringVar(&xmailer, "x-mailer", "SendMail-Golang v2.0", "Set a custom X-Mailer")
+	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
 	flag.StringVar(&htmlFile, "html-file", "", "Import HTML file as Body")
 	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
-	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
-	flag.StringVar(&encodeF, "encoding", "7bit", "Set a ncoding")
+	flag.StringVar(&encodeF, "encoding", "7bit", "Set an encoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
 	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
 
 	flag.Parse()
+
+	if flag.Arg(0) == "help" {
+		usage()
+		os.Exit(0)
+	}
 }
 
 func sendMail() {
@@ -321,7 +327,7 @@ func sendMail() {
 		content
 
 	fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
-	fmt.Println(cyanTXT + "Sending in progress... please wait!" + "\n" + endTXT)
+	fmt.Println(cyanTXT + "I am trying to send that... please wait!" + "\n" + endTXT)
 
 	if auth != false {
 		if mailFrom != "" {

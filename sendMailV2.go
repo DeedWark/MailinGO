@@ -84,7 +84,7 @@ func usage() {
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
---boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
+--boundary       Set a custom boundary (default "----=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
@@ -112,7 +112,7 @@ func flags() {
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
 	flag.StringVar(&htmlFile, "html-file", "", "Import HTML file as Body")
 	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
-	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
+	flag.StringVar(&boundary, "boundary", "----=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
 	flag.StringVar(&encodeF, "encoding", "7bit", "Set an encoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
@@ -299,17 +299,17 @@ func sendMail() {
 		encodedFile := base64.StdEncoding.EncodeToString(contentFile)
 
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
-			boundary + "\r\n" +
+			"--" + boundary + "\r\n" +
 			"Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body + "\r\n" +
-			boundary + "\r\n" +
+			"--" + boundary + "\r\n" +
 			//"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Type: " + mimeFile + "; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + boundary
+			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + "--" + boundary
 	} else {
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
@@ -368,7 +368,7 @@ func sendMail() {
 			log.Fatalln(err)
 		}
 		defer mxc.Close()
-		buf := bytes.NewBufferString(body)
+		buf := bytes.NewBufferString(baseContent)
 		if _, err = buf.WriteTo(mxc); err != nil {
 			fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
 		} else {

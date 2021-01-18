@@ -53,7 +53,7 @@ var sc = bufio.NewScanner(os.Stdin)
 var cDate = time.Now().Format("Mon, 02 Jan 2006 15:04:05 -0700")
 
 // MORE OPTIONS
-var mid string             // Message-ID
+var messageId string       // Message-ID
 var xmailer string         // X-Mailer
 var charset string         // Encoding
 var promptContent bool     // Write Content with prompt (Allow HTML)
@@ -143,6 +143,18 @@ func setCharset(charset string) string {
 	return charset
 }
 
+func setMessageID() string {
+	//////////////////////////////////////////////////////////////////////////
+	// Message-ID -> <c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this> //
+	//////////////////////////////////////////////////////////////////////////
+	b := make([]byte, 16)
+	rand.Read(b)
+	randomId := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+	var messageId = "<" + randomId + "@golangmail.this>"
+
+	return messageId
+}
+
 func sendMail() {
 	flags()
 
@@ -183,14 +195,6 @@ func sendMail() {
 	if optSmtpServ != "" {
 		smtpServ = optSmtpServ
 	}
-
-	////////////////////////////////////////////////////////////////////////
-	//Message-ID -> <c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>//
-	////////////////////////////////////////////////////////////////////////
-	b := make([]byte, 16)
-	rand.Read(b)
-	randomId := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
-	var messageId = "<" + randomId + "@golangmail.this>"
 
 	//////////////////////
 	// CONTENT - PROMPT //
@@ -321,6 +325,8 @@ func sendMail() {
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body
 	}
+
+	messageId := setMessageID()
 
 	var baseContent string = "Date: " + date + "\r\n" +
 		"From: " + hFrom + "\r\n" +

@@ -1,5 +1,5 @@
-//@Kenji DURIEZ - [DeedWark] - 2020
-//Send email with Go
+// @Kenji DURIEZ - [DeedWark] - 2020
+// Send email with Go
 
 package main
 
@@ -22,49 +22,49 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-const ( //COLOR
-	greenTXT  = "\033[92m"   //OK
-	cyanTXT   = "\033[96m"   //INFO
-	yellowTXT = "\033[1;32m" //Others
-	redTXT    = "\033[91m"   //ERROR
-	endTXT    = "\033[00m"   //Ending color
+const ( // COLOR
+	greenTXT  = "\033[92m"   // OK
+	cyanTXT   = "\033[96m"   // INFO
+	yellowTXT = "\033[1;32m" // Others
+	redTXT    = "\033[91m"   // ERROR
+	endTXT    = "\033[00m"   // Ending color
 )
 
-var optSmtpServ string //MX/SMTP flag
-var smtpServ string    //MX/SMTP server
-var port string        //PORT
-var mailFrom string    //MAIL FROM
-var rcptTo string      //RCPT TO
-var hFrom string       //Header From
-var hTo string         //Header To
-var hSub string        //Subject
-var body string        //Body
-var content string     //Content
-var date string        //Date
-var attach string      //Attachment
-var auth bool          //Allow auth (Gmail...)
-var ctype string       //Content-Type
-var encoding string    //Encoding
+var optSmtpServ string // MX/SMTP flag
+var smtpServ string    // MX/SMTP server
+var port string        // PORT
+var mailFrom string    // MAIL FROM
+var rcptTo string      // RCPT TO
+var hFrom string       // Header From
+var hTo string         // Header To
+var hSub string        // Subject
+var body string        // Body
+var content string     // Content
+var date string        // Date
+var attach string      // Attachment
+var auth bool          // Allow auth (Gmail...)
+var ctype string       // Content-Type
+var encoding string    // Encoding
 
-//OS STDIN SCANNER
+// OS STDIN SCANNER
 var sc = bufio.NewScanner(os.Stdin)
 
-//CURRENT DATE
+// CURRENT DATE
 var cDate = time.Now().Format("Mon, 02 Jan 2006 15:04:05 -0700")
 
-//MORE OPTIONS
-var mid string             //Message-ID
-var xmailer string         //X-Mailer
-var charset string         //Encoding
-var promptContent bool     //Write Content with prompt (Allow HTML)
-var htmlFile string        //Read HTML file as Body
-var htmlFileContent []byte //HTML file content
-var txtFile string         //Read txt file content
-var txtFileContent []byte  //Txt file content
-var bs64 bool              //Set base64 encoding
-var xprio string           //X-Priority
-var boundary string        //Custom Boundary
-var encodeF string         //Change encode (7bit / 8bit / binary)
+// MORE OPTIONS
+var mid string             // Message-ID
+var xmailer string         // X-Mailer
+var charset string         // Encoding
+var promptContent bool     // Write Content with prompt (Allow HTML)
+var htmlFile string        // Read HTML file as Body
+var htmlFileContent []byte // HTML file content
+var txtFile string         // Read txt file content
+var txtFileContent []byte  // Txt file content
+var bs64 bool              // Set base64 encoding
+var xprio string           // X-Priority
+var boundary string        // Custom Boundary
+var encodeF string         // Change encode (7bit / 8bit / binary)
 
 func usage() {
 	fmt.Println(`
@@ -84,7 +84,7 @@ func usage() {
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
---boundary       Set a custom boundary (default "----=_MIME_BOUNDARY_GOO_LANG--")
+--boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
@@ -92,7 +92,7 @@ func usage() {
 }
 
 func flags() {
-	//Define FLAGS
+	// Define FLAGS
 	//    TYPE       VAR      ARGS,DEFAULT    HELP
 	flag.StringVar(&optSmtpServ, "s", "", "Set SMTP/MX server")
 	flag.StringVar(&port, "p", "25", "Set TCP port")
@@ -105,14 +105,14 @@ func flags() {
 	flag.StringVar(&body, "body", "", "Content in body")
 	flag.StringVar(&attach, "attach", "", "Add an attachment")
 	flag.BoolVar(&auth, "auth", false, "Enable authentication (for Gmail/Outlook...)")
-	//MORE OPTIONS
+	// MORE OPTIONS
 	//flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
 	flag.StringVar(&xmailer, "x-mailer", "SendMail-Golang v2.0", "Set a custom X-Mailer")
 	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
 	flag.StringVar(&htmlFile, "html-file", "", "Import HTML file as Body")
 	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
-	flag.StringVar(&boundary, "boundary", "----=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
+	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
 	flag.StringVar(&encodeF, "encoding", "7bit", "Set an encoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
@@ -126,32 +126,49 @@ func flags() {
 	}
 }
 
+func setCharset(charset string) string {
+	/////////////
+	// Charset //
+	/////////////
+	if charset != "" {
+		switch strings.ToLower(charset) {
+		case "utf-8", "utf8":
+			charset = "\"UTF-8\""
+		case "usascii", "us", "us-ascii":
+			charset = "\"US-ASCII\""
+		default:
+			charset = "\"UTF-8\""
+		}
+	}
+	return charset
+}
+
 func sendMail() {
 	flags()
 
 	if rcptTo == "" {
 		fmt.Print("RCPT TO: ")
-		sc.Scan()          //Get
-		rcptTo = sc.Text() //Store os stdin
+		sc.Scan()          // Get
+		rcptTo = sc.Text() // Store os stdin
 	}
 
 	/////////////////////////////////////
 	//      RESOLVE MX WITH DOMAIN     //
 	/////////////////////////////////////
-	cutAddress := strings.Split(rcptTo, "@") //[1] //remove @
+	cutAddress := strings.Split(rcptTo, "@") // [1] // remove @
 	domainOnly := cutAddress[len(cutAddress)-1]
 
 	mxServ := []string{}
-	mxs, _ := net.LookupMX(domainOnly) //Resolve MX
+	mxs, _ := net.LookupMX(domainOnly) // Resolve MX
 
 	if len(mxs) != 0 {
 		for _, mx := range mxs {
-			mxRaw := strings.TrimRight(mx.Host, ".") //Cut ending "."
-			mxServ = append(mxServ, mxRaw)           //Store MX in mxServ list
+			mxRaw := strings.TrimRight(mx.Host, ".") // Cut ending "."
+			mxServ = append(mxServ, mxRaw)           // Store MX in mxServ list
 		}
 	}
-	cutMx := strings.Join(mxServ, "\n")  //join MX with \n
-	mxList := strings.Split(cutMx, "\n") //Slice at \n
+	cutMx := strings.Join(mxServ, "\n")  // join MX with \n
+	mxList := strings.Split(cutMx, "\n") // Slice at \n
 
 	var rMx = mxList[0]
 	if rMx != "" {
@@ -159,8 +176,8 @@ func sendMail() {
 	} else {
 		fmt.Println("SMTP server not found!" + "\n")
 		fmt.Print("SMTP: ")
-		sc.Scan()            //Get
-		smtpServ = sc.Text() //Store os stdin
+		sc.Scan()            // Get
+		smtpServ = sc.Text() // Store os stdin
 	}
 
 	if optSmtpServ != "" {
@@ -197,35 +214,21 @@ func sendMail() {
 				break
 			}
 		}
-		body = strings.Join(block, "\n") //Join multiline content
-	}
-
-	/////////////
-	// Charset //
-	/////////////
-	if charset != "" {
-		switch strings.ToLower(charset) {
-		case "utf-8", "utf8":
-			charset = "\"UTF-8\""
-		case "usascii", "us", "us-ascii":
-			charset = "\"US-ASCII\""
-		default:
-			charset = "\"UTF-8\""
-		}
+		body = strings.Join(block, "\n") // Join multiline content
 	}
 
 	//////////////////////
 	// HTML File Import //
 	//////////////////////
 	if htmlFile != "" {
-		htmlFileRaw, err := os.Open(htmlFile) //Open the HTML file
+		htmlFileRaw, err := os.Open(htmlFile) // Open the HTML file
 		if err != nil {
 			fmt.Println(redTXT + "Cannot open HTML file" + endTXT)
 			log.Fatalln(err)
 		}
 
-		reader := bufio.NewReader(htmlFileRaw)      //Init the file reader
-		htmlFileContent, _ = ioutil.ReadAll(reader) //Read and get HTML file content
+		reader := bufio.NewReader(htmlFileRaw)      // Init the file reader
+		htmlFileContent, _ = ioutil.ReadAll(reader) // Read and get HTML file content
 		body = string(htmlFileContent)
 		ctype = "text/html"
 	}
@@ -234,14 +237,14 @@ func sendMail() {
 	// TEXT File Import //
 	//////////////////////
 	if txtFile != "" {
-		txtFileRaw, err := os.Open(txtFile) //Open txt file
+		txtFileRaw, err := os.Open(txtFile) // Open txt file
 		if err != nil {
 			fmt.Println(redTXT + "Cannot open TEXT file" + endTXT)
 			log.Fatalln(err)
 		}
 
-		reader := bufio.NewReader(txtFileRaw)      //Init the file reader
-		txtFileContent, _ = ioutil.ReadAll(reader) //Read and get HTML file content
+		reader := bufio.NewReader(txtFileRaw)      // Init the file reader
+		txtFileContent, _ = ioutil.ReadAll(reader) // Read and get HTML file content
 		body = string(txtFileContent)
 		ctype = "text/plain"
 	}
@@ -280,37 +283,40 @@ func sendMail() {
 	////////////////
 	// Attachment //
 	////////////////
+	charset := setCharset(charset)
+
 	if attach != "" {
 		fileRaw := attach
 
-		contentFile, err := ioutil.ReadFile(fileRaw) //Read and get content file
+		contentFile, err := ioutil.ReadFile(fileRaw) // Read and get content file
 		if err != nil {
 			log.Fatalln(redTXT+"File error:"+endTXT, err)
 		}
 
 		mimeFile := http.DetectContentType(contentFile)
 
-		fileOnly := strings.Split(attach, "/") //Split at "/" in case of Unix Path
-		filename := fileOnly[len(fileOnly)-1]  //Get only filename
+		fileOnly := strings.Split(attach, "/") // Split at "/" in case of Unix Path
+		filename := fileOnly[len(fileOnly)-1]  // Get only filename
 
 		//
-		//ENCODE FILE/ATTACHMENT IN BASE64
+		// ENCODE FILE/ATTACHMENT IN BASE64
 		//
 		encodedFile := base64.StdEncoding.EncodeToString(contentFile)
 
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
-			"--" + boundary + "\r\n" +
+			boundary + "\r\n" +
 			"Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body + "\r\n" +
-			"--" + boundary + "\r\n" +
+			boundary + "\r\n" +
 			//"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Type: " + mimeFile + "; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + "--" + boundary
+			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + boundary
 	} else {
+
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body
@@ -331,7 +337,7 @@ func sendMail() {
 
 	if auth != false {
 		if mailFrom != "" {
-			//ASK password
+			// ASK password
 			fmt.Print("Password: ")
 			password, _ := terminal.ReadPassword(0)
 
@@ -347,7 +353,7 @@ func sendMail() {
 		}
 	} else {
 		//
-		//Connect to SMTP serv
+		// Connect to SMTP serv
 		mx, err := smtp.Dial(smtpServ + ":" + port)
 		if err != nil {
 			fmt.Println(redTXT + "Error: Cannot connect to " + smtpServ + ":" + port + "\n" + endTXT)
@@ -356,19 +362,19 @@ func sendMail() {
 		defer mx.Close()
 
 		//
-		//Set MailFrom and RcptTo
+		// Set MailFrom and RcptTo
 		mx.Mail(mailFrom)
 		mx.Rcpt(rcptTo)
 
 		//
-		//Send email body
+		// Send email body
 		mxc, err := mx.Data()
 		if err != nil {
 			fmt.Println(redTXT + "Error: " + endTXT)
 			log.Fatalln(err)
 		}
 		defer mxc.Close()
-		buf := bytes.NewBufferString(baseContent)
+		buf := bytes.NewBufferString(body)
 		if _, err = buf.WriteTo(mxc); err != nil {
 			fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
 		} else {

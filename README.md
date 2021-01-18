@@ -5,10 +5,11 @@ Send email with this Go program
 ## Setup
 ```bash
 go build -o gomail sendMailV2.go
-#and execute the built program
+
+# And run the built program
 ./gomail
 
-#mv gomail /usr/bin/gomail
+# mv gomail /usr/bin/gomail
 gomail
 ```
 
@@ -23,18 +24,19 @@ gomail
 --hto            Set Header To (ex "You <go@pher.org>")
 --subject        Set a subject
 --date           Set a custom date (default "current date")
---body           Write content to Body
+--body           Add content to Body
 --attach         Add an attachment/file
---auth           Enable authentication (just Gmail, others soon)
+--auth           Enable authentication (Gmail, Outlook...)
 --x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
---x-priority     Set a custom X-Priority
+--x-priority     Set a custom X-Priority (default "1")
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
---boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
+--boundary       Set a custom boundary (default "----=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
---base64         Encode body in base64
---prompt         Get a prompt to write content body via terminal 
+--encoding       Set an encoding (default "7bit")
+--base64         Encode body in base64 (default no)
+--prompt         Write body with a Prompt (HTML allowed)
 ```
 ## Overview
 ```

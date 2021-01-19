@@ -44,7 +44,6 @@ var date string        // Date
 var attach string      // Attachment
 var auth bool          // Allow auth (Gmail...)
 var ctype string       // Content-Type
-var encoding string    // Encoding
 
 // OS STDIN SCANNER
 var sc = bufio.NewScanner(os.Stdin)
@@ -64,8 +63,9 @@ var txtFileContent []byte  // Txt file content
 var bs64 bool              // Set base64 encoding
 var xprio string           // X-Priority
 var boundary string        // Custom Boundary
-var encodeF string         // Change encode (7bit / 8bit / binary)
+var encoding string        // Change encode (7bit / 8bit / binary)
 
+// ALL OPTIONS
 func usage() {
 	fmt.Println(`
   -s  	         Set SMTP/MX server (default "Autodetect with domain")
@@ -114,7 +114,7 @@ func flags() {
 	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
 	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
-	flag.StringVar(&encodeF, "encoding", "7bit", "Set an encoding")
+	flag.StringVar(&encoding, "encoding", "7bit", "Set an encoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
 	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
 
@@ -140,6 +140,7 @@ func setCharset(charset string) string {
 			charset = "\"UTF-8\""
 		}
 	}
+
 	return charset
 }
 
@@ -155,14 +156,27 @@ func setMessageID() string {
 	return messageId
 }
 
-func sendMail() {
-	flags()
-
-	if rcptTo == "" {
-		fmt.Print("RCPT TO: ")
-		sc.Scan()          // Get
-		rcptTo = sc.Text() // Store os stdin
+func setEncoding(encoding string) string {
+	//////////////////////
+	// Choosen Encoding //
+	//////////////////////
+	if encoding != "" {
+		switch strings.ToLower(encoding) {
+		case "7bit", "7-bit":
+			encoding = "7bit"
+		case "8-bit", "8bit":
+			encoding = "8bit"
+		case "qp", "quoted", "quoted-printable", "printable":
+			encoding = "quoted-printable"
+		default:
+			encoding = "7bit"
+		}
 	}
+
+	return encoding
+}
+
+func sendMail() {
 
 	/////////////////////////////////////
 	//      RESOLVE MX WITH DOMAIN     //
@@ -253,37 +267,6 @@ func sendMail() {
 		ctype = "text/plain"
 	}
 
-	//////////////////////
-	// Choosen Encoding //
-	//////////////////////
-	if encodeF != "" {
-		switch strings.ToLower(encodeF) {
-		case "7bit", "7-bit":
-			encodeF = "7bit"
-		case "8-bit", "8bit":
-			encodeF = "8bit"
-		case "qp", "quoted", "quoted-printable", "printable":
-			encodeF = "quoted-printable"
-		default:
-			encodeF = "7bit"
-		}
-		encoding = encodeF
-	}
-
-	///////////////////////////////
-	// Content-Transfer Encoding //
-	///////////////////////////////
-	if bs64 == true {
-		if ctype != "text/html" {
-			encoding = "base64"
-			body = base64.URLEncoding.EncodeToString([]byte(body))
-		} else {
-			encoding = "7bit"
-		}
-	} else {
-		encoding = "7bit"
-	}
-
 	////////////////
 	// Attachment //
 	////////////////
@@ -306,6 +289,8 @@ func sendMail() {
 		// ENCODE FILE/ATTACHMENT IN BASE64
 		//
 		encodedFile := base64.StdEncoding.EncodeToString(contentFile)
+
+		encoding := setEncoding(encoding)
 
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
 			boundary + "\r\n" +
@@ -421,5 +406,16 @@ func rfcSplit(body string, limit int, end string) string {
 }
 
 func main() {
+	flags() // CALL FLAGS
+
+	// Check if rcptTo is empty
+	if rcptTo == "" {
+		fmt.Print("RCPT TO: ")
+		sc.Scan()          // Get
+		rcptTo = sc.Text() // Store os stdin
+
+		//return
+	}
+
 	sendMail()
 }

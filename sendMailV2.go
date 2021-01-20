@@ -64,6 +64,7 @@ var bs64 bool              // Set base64 encoding
 var xprio string           // X-Priority
 var boundary string        // Custom Boundary
 var encoding string        // Change encode (7bit / 8bit / binary)
+var saveEml bool           // Save email to an EML file
 
 // ALL OPTIONS
 func usage() {
@@ -88,7 +89,8 @@ func usage() {
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
---prompt         Write body with a Prompt (HTML allowed) ` + "\r\n")
+--prompt         Write body with a Prompt (HTML allowed) 
+--save           Save email to an EML file ` + "\r\n")
 }
 
 func flags() {
@@ -112,11 +114,12 @@ func flags() {
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
 	flag.StringVar(&htmlFile, "html-file", "", "Import HTML file as Body")
 	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
-	flag.StringVar(&boundary, "boundary", "------=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
+	flag.StringVar(&boundary, "boundary", "----=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
 	flag.StringVar(&encoding, "encoding", "7bit", "Set an encoding")
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
 	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
+	flag.BoolVar(&saveEml, "save", false, "Save email to an EML file")
 
 	flag.Parse()
 
@@ -176,8 +179,7 @@ func setEncoding(encoding string) string {
 	return encoding
 }
 
-func sendMail() {
-
+func resolveMX(rcptTo string) string {
 	/////////////////////////////////////
 	//      RESOLVE MX WITH DOMAIN     //
 	/////////////////////////////////////
@@ -210,6 +212,10 @@ func sendMail() {
 		smtpServ = optSmtpServ
 	}
 
+	return smtpServ
+}
+
+func sendMail() {
 	//////////////////////
 	// CONTENT - PROMPT //
 	//////////////////////
@@ -267,6 +273,22 @@ func sendMail() {
 		ctype = "text/plain"
 	}
 
+	///////////////////////////////
+	// Content-Transfer Encoding //
+	///////////////////////////////
+	if bs64 == true {
+		fmt.Print("base64 is true")
+		if ctype == "text/html" {
+			encoding = "7bit"
+		} else {
+			encoding = "base64"
+			body = base64.URLEncoding.EncodeToString([]byte(body))
+		}
+	} else {
+		fmt.Println("base64 is false")
+		encoding = "7bit"
+	}
+
 	////////////////
 	// Attachment //
 	////////////////
@@ -293,17 +315,17 @@ func sendMail() {
 		encoding := setEncoding(encoding)
 
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
-			boundary + "\r\n" +
+			"--" + boundary + "\r\n" +
 			"Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body + "\r\n" +
-			boundary + "\r\n" +
+			"--" + boundary + "\r\n" +
 			//"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Type: " + mimeFile + "; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + boundary
+			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + "--" + boundary
 	} else {
 
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
@@ -324,7 +346,19 @@ func sendMail() {
 		content
 
 	fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
+
+	// SAVE EML
+	if saveEml == true {
+		write := []byte(baseContent + "\r\n")
+		err := ioutil.WriteFile("./savedEmail.eml", write, 0644)
+		if err != nil {
+			fmt.Println(redTXT + "Cannot save this email to an EML file!")
+		}
+	}
+
 	fmt.Println(cyanTXT + "I am trying to send that... please wait!" + "\n" + endTXT)
+
+	resolveMX(rcptTo)
 
 	if auth != false {
 		if mailFrom != "" {
@@ -335,7 +369,7 @@ func sendMail() {
 			from := mailFrom
 			err := smtp.SendMail("smtp.gmail.com:587",
 				smtp.PlainAuth("", from, string(password), "smtp.gmail.com"),
-				from, []string{rcptTo}, []byte(body))
+				from, []string{rcptTo}, []byte(baseContent))
 			fmt.Println(string(password))
 			if err != nil {
 				fmt.Println(redTXT + "Error with Auth" + endTXT)
@@ -365,7 +399,7 @@ func sendMail() {
 			log.Fatalln(err)
 		}
 		defer mxc.Close()
-		buf := bytes.NewBufferString(body)
+		buf := bytes.NewBufferString(baseContent)
 		if _, err = buf.WriteTo(mxc); err != nil {
 			fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
 		} else {
@@ -373,12 +407,13 @@ func sendMail() {
 		}
 
 	}
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Split attachment base64 encoding according to RFC (max 76 chars by line) //
-/////////////////////////////////////////////////////////////////////////////
 func rfcSplit(body string, limit int, end string) string {
+	///////////////////////////////////////////////////////////////////////////////
+	// Split attachment base64 encoding according to RFC (max 76 chars by line) //
+	/////////////////////////////////////////////////////////////////////////////
 	var charSlice []rune
 
 	// push characters to slice
@@ -402,7 +437,9 @@ func rfcSplit(body string, limit int, end string) string {
 			limit = len(charSlice)
 		}
 	}
+
 	return result
+
 }
 
 func main() {
@@ -413,8 +450,6 @@ func main() {
 		fmt.Print("RCPT TO: ")
 		sc.Scan()          // Get
 		rcptTo = sc.Text() // Store os stdin
-
-		//return
 	}
 
 	sendMail()

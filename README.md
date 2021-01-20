@@ -32,11 +32,12 @@ gomail
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
---boundary       Set a custom boundary (default "----=_MIME_BOUNDARY_GOO_LANG--")
+--boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
---prompt         Write body with a Prompt (HTML allowed)
+--prompt         Write body with a Prompt (HTML allowed) 
+--save           Save email to an EML file
 ```
 ## Overview
 ```

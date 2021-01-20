@@ -274,19 +274,15 @@ func sendMail() {
 	}
 
 	///////////////////////////////
-	// Content-Transfer Encoding //
+	// Content-Transfer-Encoding //
 	///////////////////////////////
 	encoding := setEncoding(encoding)
 
-	if bs64 == true {
-		if ctype == "text/html" {
-			encoding = "7bit"
-		} else {
-			encoding = "base64"
-			body = base64.URLEncoding.EncodeToString([]byte(body))
-		}
-	} else {
+	if bs64 == true && ctype == "text/html" {
 		encoding = "7bit"
+	} else if bs64 == true && ctype != "text/html" {
+		encoding = "base64"
+		body = base64.URLEncoding.EncodeToString([]byte(body))
 	}
 
 	////////////////
@@ -436,7 +432,6 @@ func rfcSplit(body string, limit int, end string) string {
 	}
 
 	return result
-
 }
 
 func main() {

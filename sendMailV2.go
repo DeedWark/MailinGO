@@ -276,8 +276,9 @@ func sendMail() {
 	///////////////////////////////
 	// Content-Transfer Encoding //
 	///////////////////////////////
+	encoding := setEncoding(encoding)
+
 	if bs64 == true {
-		fmt.Print("base64 is true")
 		if ctype == "text/html" {
 			encoding = "7bit"
 		} else {
@@ -285,7 +286,6 @@ func sendMail() {
 			body = base64.URLEncoding.EncodeToString([]byte(body))
 		}
 	} else {
-		fmt.Println("base64 is false")
 		encoding = "7bit"
 	}
 
@@ -312,15 +312,12 @@ func sendMail() {
 		//
 		encodedFile := base64.StdEncoding.EncodeToString(contentFile)
 
-		encoding := setEncoding(encoding)
-
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
 			"--" + boundary + "\r\n" +
 			"Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body + "\r\n" +
 			"--" + boundary + "\r\n" +
-			//"Content-Type: application/octet-stream; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Type: " + mimeFile + "; name=\"" + filename + "\"" + "\r\n" +
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +

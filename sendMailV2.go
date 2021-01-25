@@ -30,41 +30,43 @@ const ( // COLOR
 	endTXT    = "\033[00m"   // Ending color
 )
 
-var optSmtpServ string // MX/SMTP flag
-var smtpServ string    // MX/SMTP server
-var port string        // PORT
-var mailFrom string    // MAIL FROM
-var rcptTo string      // RCPT TO
-var hFrom string       // Header From
-var hTo string         // Header To
-var hSub string        // Subject
-var body string        // Body
-var content string     // Content
-var date string        // Date
-var attach string      // Attachment
-var auth bool          // Allow auth (Gmail...)
-var ctype string       // Content-Type
+var (
+	optSmtpServ string // MX/SMTP flag
+	smtpServ    string // MX/SMTP server
+	port        string // PORT
+	mailFrom    string // MAIL FROM
+	rcptTo      string // RCPT TO
+	hFrom       string // Header From
+	hTo         string // Header To
+	hSub        string // Subject
+	body        string // Body
+	content     string // Content
+	date        string // Date
+	attach      string // Attachment
+	auth        bool   // Allow auth (Gmail...)
+	ctype       string // Content-Type
 
-// OS STDIN SCANNER
-var sc = bufio.NewScanner(os.Stdin)
+	// OS STDIN SCANNER
+	sc = bufio.NewScanner(os.Stdin)
 
-// CURRENT DATE
-var cDate = time.Now().Format("Mon, 02 Jan 2006 15:04:05 -0700")
+	// CURRENT DATE
+	cDate = time.Now().Format("Mon, 02 Jan 2006 15:04:05 -0700")
 
-// MORE OPTIONS
-var messageId string       // Message-ID
-var xmailer string         // X-Mailer
-var charset string         // Encoding
-var promptContent bool     // Write Content with prompt (Allow HTML)
-var htmlFile string        // Read HTML file as Body
-var htmlFileContent []byte // HTML file content
-var txtFile string         // Read txt file content
-var txtFileContent []byte  // Txt file content
-var bs64 bool              // Set base64 encoding
-var xprio string           // X-Priority
-var boundary string        // Custom Boundary
-var encoding string        // Change encode (7bit / 8bit / binary)
-var saveEml bool           // Save email to an EML file
+	// MORE OPTIONS
+	messageId       string // Message-ID
+	xmailer         string // X-Mailer
+	charset         string // Encoding
+	promptContent   bool   // Write Content with prompt (Allow HTML)
+	htmlFile        string // Read HTML file as Body
+	htmlFileContent []byte // HTML file content
+	txtFile         string // Read txt file content
+	txtFileContent  []byte // Txt file content
+	bs64            bool   // Set base64 encoding
+	xprio           string // X-Priority
+	boundary        string // Custom Boundary
+	encoding        string // Change encode (7bit / 8bit / binary)
+	saveEml         bool   // Save email to an EML file
+)
 
 // ALL OPTIONS
 func usage() {

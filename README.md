@@ -3,14 +3,26 @@
 Send email with this Go program
 
 ## Setup
+- LINUX
 ```bash
 go build -o gomail sendMailV2.go
 
 # And run the built program
-./gomail
+./gomail ...
 
 # mv gomail /usr/bin/gomail
-gomail
+gomail ...
+```
+
+- WINDOWS (from Linux to export it)
+```bash
+env GOOS=windows GOARCH=amd64 go build -o gomail.exe sendMailV2.go
+.\gomail.exe ...
+```
+
+- WINDOWS (from Windows)
+```powershell
+go build -o gomail.exe sendMailV2.go
 ```
 
 ## How to use

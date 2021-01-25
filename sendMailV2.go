@@ -17,6 +17,7 @@ import (
 	"net/smtp"
 	"os"
 	"strings"
+	"syscall"
 	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -43,7 +44,6 @@ var (
 	content     string // Content
 	date        string // Date
 	attach      string // Attachment
-	auth        bool   // Allow auth (Gmail...)
 	ctype       string // Content-Type
 
 	// OS STDIN SCANNER
@@ -65,6 +65,7 @@ var (
 	xprio           string // X-Priority
 	boundary        string // Custom Boundary
 	encoding        string // Change encode (7bit / 8bit / binary)
+	gmail           bool   // Allow auth (Gmail...)
 	saveEml         bool   // Save email to an EML file
 )
 
@@ -81,7 +82,7 @@ func usage() {
 --date           Set a custom date (default "current date")
 --body           Add content to Body
 --attach         Add an attachment/file
---auth           Enable authentication (Gmail, Outlook...)
+--gmail          Enable authentication (Gmail)
 --x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
 --x-priority     Set a custom X-Priority (default "1")
 --charset        Set a custom charset (default "UTF-8")
@@ -108,7 +109,7 @@ func flags() {
 	flag.StringVar(&date, "date", cDate, "Set a custom date")
 	flag.StringVar(&body, "body", "", "Content in body")
 	flag.StringVar(&attach, "attach", "", "Add an attachment")
-	flag.BoolVar(&auth, "auth", false, "Enable authentication (for Gmail/Outlook...)")
+	flag.BoolVar(&gmail, "gmail", false, "Enable authentication (for Gmail)")
 	// MORE OPTIONS
 	//flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
 	flag.StringVar(&xmailer, "x-mailer", "SendMail-Golang v2.0", "Set a custom X-Mailer")
@@ -355,11 +356,11 @@ func sendMail() {
 
 	resolveMX(rcptTo)
 
-	if auth != false {
+	if gmail != false {
 		if mailFrom != "" {
 			// ASK password
 			fmt.Print("Password: ")
-			password, _ := terminal.ReadPassword(0)
+			password, _ := terminal.ReadPassword(int(syscall.Stdin))
 
 			from := mailFrom
 			err := smtp.SendMail("smtp.gmail.com:587",

@@ -16,13 +16,13 @@ gomail ...
 
 - WINDOWS (from Linux to export it)
 ```bash
-env GOOS=windows GOARCH=amd64 go build -o gomail sendMailV2.go
+env GOOS=windows GOARCH=amd64 go build -o gomail.exe sendMailV2.go
 .\gomail.exe ...
 ```
 
 - WINDOWS (from Windows)
 ```powershell
-go build -o gomail sendMailV2.go
+go build -o gomail.exe sendMailV2.go
 ```
 
 ## How to use

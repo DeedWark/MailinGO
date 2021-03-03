@@ -286,6 +286,9 @@ func sendMail() {
 	} else if bs64 == true && ctype != "text/html" {
 		encoding = "base64"
 		body = base64.URLEncoding.EncodeToString([]byte(body))
+		if len(body) > 77 {
+			body = rfcSplit(body, 76, "\n")
+		}
 	}
 
 	////////////////
@@ -311,6 +314,10 @@ func sendMail() {
 		//
 		encodedFile := base64.StdEncoding.EncodeToString(contentFile)
 
+		if len(encodedFile) > 77 {
+			encodedFile = rfcSplit(encodedFile, 76, "\n")
+		}
+
 		content = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n\r\n" +
 			"--" + boundary + "\r\n" +
 			"Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
@@ -321,7 +328,7 @@ func sendMail() {
 			"Content-Description: " + filename + "\r\n" +
 			"Content-Disposition: attachment; filename=\"" + filename + "\"" + "\r\n" +
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
-			rfcSplit(encodedFile, 76, "\n") + "\r\n\r\n" + "--" + boundary
+			encodedFile + "\r\n\r\n" + "--" + boundary
 	} else {
 
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +

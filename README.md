@@ -56,7 +56,6 @@ go build -o gomail.exe sendmail.go
 ## Overview
 ```
 ---------------Overview---------------
-
 Date: Mon, 12 Oct 2020 20:00:00 +0200From: Me <sender@domain.com>
 To: You <receiver@domain.com>
 Subject: Hello

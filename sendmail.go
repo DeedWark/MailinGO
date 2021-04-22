@@ -67,6 +67,7 @@ var (
 	encoding        string // Change encode (7bit / 8bit / binary)
 	gmail           bool   // Allow auth (Gmail...)
 	saveEml         bool   // Save email to an EML file
+	silent          bool   // Silent mode - Do not disaply overview or info
 )
 
 // ALL OPTIONS
@@ -93,7 +94,8 @@ func usage() {
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
 --prompt         Write body with a Prompt (HTML allowed) 
---save           Save email to an EML file ` + "\r\n")
+--save           Save email to an EML file 
+--silent         Silent mode - Do not display overview or info ` + "\r\n")
 }
 
 func flags() {
@@ -123,6 +125,7 @@ func flags() {
 	flag.BoolVar(&bs64, "base64", false, "Encode body in base64")
 	flag.BoolVar(&promptContent, "body-prompt", false, "Write content with a Prompt (HTML allowed)")
 	flag.BoolVar(&saveEml, "save", false, "Save email to an EML file")
+	flag.BoolVar(&silent, "silent", false, "Silent mode - Do not display overview or info")
 
 	flag.Parse()
 
@@ -348,7 +351,9 @@ func sendMail() {
 		"MIME-Version: 1.0" + "\r\n" +
 		content
 
-	fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
+	if silent != true {
+		fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
+	}
 
 	// SAVE EML
 	if saveEml == true {
@@ -359,7 +364,9 @@ func sendMail() {
 		}
 	}
 
-	fmt.Println(cyanTXT + "I am trying to send that... please wait!" + "\n" + endTXT)
+	if silent != true {
+		fmt.Println(cyanTXT + "I am trying to send that... please wait!" + "\n" + endTXT)
+	}
 
 	resolveMX(rcptTo)
 
@@ -404,9 +411,13 @@ func sendMail() {
 		defer mxc.Close()
 		buf := bytes.NewBufferString(baseContent)
 		if _, err = buf.WriteTo(mxc); err != nil {
-			fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
+			if silent != true {
+				fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
+			}
 		} else {
-			fmt.Println(greenTXT + "250: Mail sent!  -->  Message-ID: " + messageId + "\r\n")
+			if silent != true {
+				fmt.Println(greenTXT + "250: Mail sent!  -->  Message-ID: " + messageId + "\r\n")
+			}
 		}
 
 	}

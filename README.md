@@ -1,30 +1,30 @@
-# SendMail (Golang)
+# MailinGO
 
-Send email with this Go program
+Build an email and send it with Go (in your Terminal)
 
 ## Setup
 - LINUX
 ```bash
 go build .
 ### OR ###
-go build -o gomail sendmail.go
+go build -o mailingo mailin.go
 
 # And run the built program
-./gomail ...
+./mailingo ...
 
-# mv gomail /usr/bin/gomail
-gomail ...
+# mv gomail /usr/bin/mailingo
+mailingo ...
 ```
 
 - WINDOWS (from Linux to export it)
 ```powershell
-env GOOS=windows GOARCH=amd64 go build -o gomail.exe sendmail.go
-.\gomail.exe ...
+env GOOS=windows GOARCH=amd64 go build -o mailingo.exe mailin.go
+.\mailingo.exe ...
 ```
 
 - WINDOWS (from Windows)
 ```powershell
-go build -o gomail.exe sendmail.go
+go build -o mailingo.exe mailin.go
 ```
 
 ## How to use

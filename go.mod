@@ -1,4 +1,4 @@
-module github.com/DeedWark/SendMail-Golang
+module github.com/DeedWark/mailinGO
 
 go 1.16
 

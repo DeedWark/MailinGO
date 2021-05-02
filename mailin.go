@@ -1,5 +1,5 @@
 // @Kenji DURIEZ - [DeedWark] - 2020
-// Send email with Go
+// Build an email and send it in Go
 
 package main
 

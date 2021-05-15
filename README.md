@@ -41,7 +41,7 @@ go build -o mailingo.exe mailin.go
 --body           Add content to Body
 --attach         Add an attachment/file
 --auth           Enable authentication (Gmail, Outlook...)
---x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
+--x-mailer       Set a custom X-Mailer (default "MailinGO v1.0")
 --x-priority     Set a custom X-Priority (default "1")
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body

@@ -114,11 +114,11 @@ func flags() {
 	flag.BoolVar(&gmail, "gmail", false, "Enable authentication (for Gmail)")
 	// MORE OPTIONS
 	//flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
-	flag.StringVar(&xmailer, "x-mailer", "SendMail-Golang v2.0", "Set a custom X-Mailer")
+	flag.StringVar(&xmailer, "x-mailer", "MailinGO v1.0", "Set a custom X-Mailer")
 	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
 	flag.StringVar(&htmlFile, "html-file", "", "Import HTML file as Body")
-	flag.StringVar(&txtFile, "text-file", "", "Import Text file as body")
+	flag.StringVar(&txtFile, "text-file", "", "Import Text file as Body")
 	flag.StringVar(&boundary, "boundary", "----=_MIME_BOUNDARY_GOO_LANG--", "Set a custom Boudnary")
 	flag.StringVar(&ctype, "content-type", "text/plain", "Set a custom Content-Type")
 	flag.StringVar(&encoding, "encoding", "7bit", "Set an encoding")

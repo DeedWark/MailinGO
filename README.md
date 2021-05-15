@@ -79,7 +79,7 @@ From: Me <sender@domain.com>
 To: You <receiver@domain.com>
 Subject: Hello
 Message-ID: <687a38e5-6d7e-499c-1607-2d696574c354@golangmail.this>
-X-Mailer: SendMail-Golang v1.0
+X-Mailer: MailinGO v1.0
 X-Priority: 1
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="----=_MIME_BOUNDARY_GOO_LANG"

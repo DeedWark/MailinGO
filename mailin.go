@@ -84,12 +84,12 @@ func usage() {
 --body           Add content to Body
 --attach         Add an attachment/file
 --gmail          Enable authentication (Gmail)
---x-mailer       Set a custom X-Mailer (default "SendMail-Golang v2.0")
+--x-mailer       Set a custom X-Mailer (default "MailinGO v1.0")
 --x-priority     Set a custom X-Priority (default "1")
 --charset        Set a custom charset (default "UTF-8")
 --html-file      Import a HTML file as body
 --text-file      Import a TXT file as body
---boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_GOO_LANG--")
+--boundary       Set a custom boundary (default "------=_MIME_BOUNDARY_MAILIN_GO--")
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)

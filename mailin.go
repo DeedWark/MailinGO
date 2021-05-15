@@ -173,7 +173,7 @@ func setEncoding(encoding string) string {
 		switch strings.ToLower(encoding) {
 		case "7bit", "7-bit":
 			encoding = "7bit"
-		case "8-bit", "8bit":
+		case "8bit", "8-bit":
 			encoding = "8bit"
 		case "qp", "quoted", "quoted-printable", "printable":
 			encoding = "quoted-printable"

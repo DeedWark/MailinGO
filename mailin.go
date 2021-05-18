@@ -292,6 +292,10 @@ func sendMail() {
 		if len(body) > 77 {
 			body = rfcSplit(body, 76, "\n")
 		}
+	} else {
+		if len(body) > 77 {
+			body = rfcSplit(body, 76, "\n")
+		}
 	}
 
 	////////////////

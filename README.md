@@ -57,7 +57,8 @@ go build -o mailingo.exe mailin.go
 ## Overview
 ```
 ---------------Overview---------------
-Date: Mon, 12 Oct 2020 20:00:00 +0200From: Me <sender@domain.com>
+Date: Mon, 12 Oct 2020 20:00:00 +0200
+From: Me <sender@domain.com>
 To: You <receiver@domain.com>
 Subject: Hello
 Message-ID: <c5896269-c2c4-77e3-4bd7-a3b5feBc71a@golangmail.this>

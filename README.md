@@ -50,7 +50,7 @@ go build -o mailingo.exe mailin.go
 --content-type   Set a custom Content-Type (default "text/plain")
 --encoding       Set an encoding (default "7bit")
 --base64         Encode body in base64 (default no)
---prompt         Write body with a Prompt (HTML allowed) 
+--body-prompt    Write body with a Prompt (HTML allowed) 
 --save           Save email to an EML file
 --silent         Silent mode - Do not display overview or info
 ```

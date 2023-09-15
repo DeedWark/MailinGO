@@ -72,7 +72,7 @@ var (
 
 // ALL OPTIONS
 func usage() {
-	fmt.Println(`
+	fmt.Printf(`
   -s  	         Set SMTP/MX server (default "Autodetect with domain")
   -p  	         Set TCP Port (default "25/SMTP")
   -f             Set MAIL FROM (protocolar)
@@ -95,7 +95,7 @@ func usage() {
 --base64         Encode body in base64 (default no)
 --prompt         Write body with a Prompt (HTML allowed) 
 --save           Save email to an EML file 
---silent         Silent mode - Do not display overview or info ` + "\r\n")
+--silent         Silent mode - Do not display overview or info ` + "\r\n\n")
 }
 
 func flags() {
@@ -208,7 +208,7 @@ func resolveMX(rcptTo string) string {
 	if rMx != "" {
 		smtpServ = rMx
 	} else {
-		fmt.Println("SMTP server not found!" + "\n")
+		fmt.Printf("SMTP server not found!" + "\n\n")
 		fmt.Print("SMTP: ")
 		sc.Scan()            // Get
 		smtpServ = sc.Text() // Store os stdin
@@ -384,7 +384,6 @@ func sendMail() {
 			err := smtp.SendMail("smtp.gmail.com:587",
 				smtp.PlainAuth("", from, string(password), "smtp.gmail.com"),
 				from, []string{rcptTo}, []byte(baseContent))
-			fmt.Println(string(password))
 			if err != nil {
 				fmt.Println(redTXT + "Error with Auth" + endTXT)
 				log.Fatalln(err)

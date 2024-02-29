@@ -10,7 +10,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -20,7 +20,7 @@ import (
 	"syscall"
 	"time"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 const ( // COLOR
@@ -113,7 +113,7 @@ func flags() {
 	flag.StringVar(&attach, "attach", "", "Add an attachment")
 	flag.BoolVar(&gmail, "gmail", false, "Enable authentication (for Gmail)")
 	// MORE OPTIONS
-	//flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
+	// flag.StringVar(&mid, "mid", "<c1882e5b-18b0-3ab5-89a0-ce6a534da8d4@golangmail.this>", "Set a custom Message-ID")
 	flag.StringVar(&xmailer, "x-mailer", "MailinGO v1.0", "Set a custom X-Mailer")
 	flag.StringVar(&xprio, "x-priority", "1", "Set a custom X-Priority")
 	flag.StringVar(&charset, "charset", "UTF-8", "Set a charset format")
@@ -160,7 +160,7 @@ func setMessageID() string {
 	b := make([]byte, 16)
 	rand.Read(b)
 	randomId := fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
-	var messageId = "<" + randomId + "@golangmail.this>"
+	messageId := "<" + randomId + "@golangmail.this>"
 
 	return messageId
 }
@@ -204,7 +204,7 @@ func resolveMX(rcptTo string) string {
 	cutMx := strings.Join(mxServ, "\n")  // join MX with \n
 	mxList := strings.Split(cutMx, "\n") // Slice at \n
 
-	var rMx = mxList[0]
+	rMx := mxList[0]
 	if rMx != "" {
 		smtpServ = rMx
 	} else {
@@ -225,7 +225,7 @@ func sendMail() {
 	//////////////////////
 	// CONTENT - PROMPT //
 	//////////////////////
-	if promptContent == true {
+	if promptContent {
 		fmt.Println("CONTENT [. to quit]")
 		block := []string{}
 		for sc.Scan() {
@@ -257,8 +257,8 @@ func sendMail() {
 			log.Fatalln(err)
 		}
 
-		reader := bufio.NewReader(htmlFileRaw)      // Init the file reader
-		htmlFileContent, _ = ioutil.ReadAll(reader) // Read and get HTML file content
+		reader := bufio.NewReader(htmlFileRaw)  // Init the file reader
+		htmlFileContent, _ = io.ReadAll(reader) // Read and get HTML file content
 		body = string(htmlFileContent)
 		ctype = "text/html"
 	}
@@ -273,8 +273,8 @@ func sendMail() {
 			log.Fatalln(err)
 		}
 
-		reader := bufio.NewReader(txtFileRaw)      // Init the file reader
-		txtFileContent, _ = ioutil.ReadAll(reader) // Read and get HTML file content
+		reader := bufio.NewReader(txtFileRaw)  // Init the file reader
+		txtFileContent, _ = io.ReadAll(reader) // Read and get HTML file content
 		body = string(txtFileContent)
 		ctype = "text/plain"
 	}
@@ -284,9 +284,9 @@ func sendMail() {
 	///////////////////////////////
 	encoding := setEncoding(encoding)
 
-	if bs64 == true && ctype == "text/html" {
+	if bs64 && ctype == "text/html" {
 		encoding = "7bit"
-	} else if bs64 == true && ctype != "text/html" {
+	} else if bs64 && ctype != "text/html" {
 		encoding = "base64"
 		body = base64.URLEncoding.EncodeToString([]byte(body))
 		if len(body) > 77 {
@@ -306,7 +306,7 @@ func sendMail() {
 	if attach != "" {
 		fileRaw := attach
 
-		contentFile, err := ioutil.ReadFile(fileRaw) // Read and get content file
+		contentFile, err := os.ReadFile(fileRaw) // Read and get content file
 		if err != nil {
 			log.Fatalln(redTXT+"File error:"+endTXT, err)
 		}
@@ -337,7 +337,6 @@ func sendMail() {
 			"Content-Transfer-Encoding: base64" + "\r\n\r\n" +
 			encodedFile + "\r\n\r\n" + "--" + boundary
 	} else {
-
 		content = "Content-Type: " + ctype + "; charset=" + charset + "\r\n" +
 			"Content-Transfer-Encoding: " + encoding + "\r\n" +
 			"\r\n" + body
@@ -345,7 +344,7 @@ func sendMail() {
 
 	messageId := setMessageID()
 
-	var baseContent string = "Date: " + date + "\r\n" +
+	baseContent := "Date: " + date + "\r\n" +
 		"From: " + hFrom + "\r\n" +
 		"To: " + hTo + "\r\n" +
 		"Subject: " + hSub + "\r\n" +
@@ -355,30 +354,30 @@ func sendMail() {
 		"MIME-Version: 1.0" + "\r\n" +
 		content
 
-	if silent != true {
+	if !silent {
 		fmt.Println("\r\n" + yellowTXT + "---------------Overview---------------" + endTXT + "\n" + baseContent + "\n" + yellowTXT + "--------------------------------------" + endTXT)
 	}
 
 	// SAVE EML
-	if saveEml == true {
+	if saveEml {
 		write := []byte(baseContent + "\r\n")
-		err := ioutil.WriteFile("./savedEmail.eml", write, 0644)
+		err := os.WriteFile("./savedEmail.eml", write, 0644)
 		if err != nil {
 			fmt.Println(redTXT + "Cannot save this email to an EML file!")
 		}
 	}
 
-	if silent != true {
+	if !silent {
 		fmt.Println(cyanTXT + "I am trying to send that... please wait!" + "\n" + endTXT)
 	}
 
 	resolveMX(rcptTo)
 
-	if gmail != false {
+	if gmail {
 		if mailFrom != "" {
 			// ASK password
 			fmt.Print("Password: ")
-			password, _ := terminal.ReadPassword(int(syscall.Stdin))
+			password, _ := term.ReadPassword(int(syscall.Stdin))
 
 			from := mailFrom
 			err := smtp.SendMail("smtp.gmail.com:587",
@@ -414,17 +413,16 @@ func sendMail() {
 		defer mxc.Close()
 		buf := bytes.NewBufferString(baseContent)
 		if _, err = buf.WriteTo(mxc); err != nil {
-			if silent != true {
+			if !silent {
 				fmt.Println(redTXT + "500: Mail not sent!" + endTXT)
 			}
 		} else {
-			if silent != true {
+			if !silent {
 				fmt.Println(greenTXT + "250: Mail sent!  -->  Message-ID: " + messageId + "\r\n")
 			}
 		}
 
 	}
-
 }
 
 func rfcSplit(body string, limit int, end string) string {
@@ -438,7 +436,7 @@ func rfcSplit(body string, limit int, end string) string {
 		charSlice = append(charSlice, char)
 	}
 
-	var result = ""
+	var result string
 
 	for len(charSlice) >= 1 {
 		// convert slice/array back to string
